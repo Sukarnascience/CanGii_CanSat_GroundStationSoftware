@@ -1,0 +1,16 @@
+colorama==0.4.6
+customtkinter==5.2.0
+imageio==2.31.2
+jsonschema==4.17.3
+matplotlib==3.5.3
+numpy==1.21.6
+pandas==1.1.5
+Pillow==9.0.0
+psutil==5.9.6
+pyserial==3.5
+pywebview==4.4.1
+requests==2.31.0
+serial==0.0.97
+tk==0.1.0
+tkintermapview==1.29
+websocket-client==1.6.1
