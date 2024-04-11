@@ -1,4 +1,6 @@
-# CanGii
+# CanGii V8.14.15
+
+> **Whats New in V8.14.15 ?** : Added APRS Feture to collect Lang,Lat,Alti 
 
 CanGii is a Python-based satellite data visualization tool for real-time monitoring and analysis of telemetry data. It offers a user-friendly interface and supports various satellite communication protocols.
 
