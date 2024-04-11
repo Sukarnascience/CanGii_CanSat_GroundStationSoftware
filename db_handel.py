@@ -32,20 +32,20 @@ class database():
         self.graphData = self.collectData[len(self.collectData)-self.graphChartLen:len(self.collectData)]
         countT = 0
         for i in self.graphData:
-            self.graphTempP[1][countT] = i[15]
-            self.graphTempP[0][countT] = i[2]
+            self.graphTempP[1][countT] = i[5]
+            self.graphTempP[0][countT] = i[1]
             countT+=1
         #print(self.graphTempP)
         countA = 0
         for i in self.graphData:
-            self.graphAltiP[1][countA] = i[12]
-            self.graphAltiP[0][countA] = i[2]
+            self.graphAltiP[1][countA] = i[3]
+            self.graphAltiP[0][countA] = i[1]
             countA+=1
         #print(self.graphAltiP)
         countH = 0
         for i in self.graphData:
             self.graphHumiP[1][countH] = i[14]
-            self.graphHumiP[0][countH] = i[2]
+            self.graphHumiP[0][countH] = i[1]
             countH+=1
         #print(self.graphHumiP)
         return [self.graphTempP,self.graphHumiP,self.graphAltiP]

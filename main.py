@@ -9,6 +9,9 @@ import requests
 import io
 import socket
 
+import requests
+from datetime import datetime
+
 import os
 from PIL import Image
 import matplotlib.pyplot as plt  
@@ -30,7 +33,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.MAX_DATA_TO_PLOT = 6
-        self.LENGHTOFDATA = 20
+        self.LENGHTOFDATA = 21
         self.TEMPGRAPHIMG = "tempGraph.png"
         self.HUMIGRAPHIMG = "humiGraph.png"
         self.ALTIGRAPHIMG = "altiGraph.png"
@@ -38,6 +41,11 @@ class App(customtkinter.CTk):
         self.temp = [-1,-1,-1]
         self.globalDataToPlot = ""
         self.press_value = 0
+        #APRS
+        self.callsign = 'VU3YDJ'
+        self.loc = 'OI33'
+        self.apikey = '180657.6sGZMpqplCbd1IuB'
+        self.aprs_data_list = [-999, -999, -999]
 
         # configure window
         self.title("Vaayuvega Flight Panel")
@@ -169,14 +177,16 @@ class App(customtkinter.CTk):
         self.tabview.tab("Calibration 02").grid_columnconfigure(0, weight=1)
         self.tabview.tab("Location").grid_columnconfigure(0, weight=1)
 
-        self.optionmenu_1 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Temperature ±XX °C")
-        self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(5, 10))
-        self.optionmenu_2 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Humidity ±XX %")
-        self.optionmenu_2.grid(row=1, column=0, padx=20, pady=(5, 10))
-        self.optionmenu_3 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Pressure ±XX hPa")
-        self.optionmenu_3.grid(row=3, column=0, padx=20, pady=(5, 10))
-        self.optionmenu_4 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Altitude ±XX m")
-        self.optionmenu_4.grid(row=4, column=0, padx=20, pady=(5, 10))
+        #self.optionmenu_1 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Temperature ±XX °C")
+        #self.optionmenu_1.grid(row=0, column=0, padx=20, pady=(5, 10))
+        #self.optionmenu_2 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Humidity ±XX %")
+        #self.optionmenu_2.grid(row=1, column=0, padx=20, pady=(5, 10))
+        #self.optionmenu_3 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Pressure ±XX hPa")
+        #self.optionmenu_3.grid(row=3, column=0, padx=20, pady=(5, 10))
+        #self.optionmenu_4 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Altitude ±XX m")
+        #self.optionmenu_4.grid(row=4, column=0, padx=20, pady=(5, 10))
+        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Start Telemetry")#, command=self.updateGraphTemp)
+        self.combobox_1.grid(row=4, column=0, padx=20, pady=(5, 10))
         self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Calibrate")#, command=self.updateGraphTemp)
         self.combobox_1.grid(row=5, column=0, padx=20, pady=(5, 10))
 
@@ -206,6 +216,8 @@ class App(customtkinter.CTk):
         self.LatiL.grid(row=3, column=0, padx=5, pady=(5,10), sticky="")
         self.LogiL = customtkinter.CTkLabel(master=self.tabview.tab("Location"), text=("longitude:\n---"),font=customtkinter.CTkFont(size=14), justify='center')
         self.LogiL.grid(row=4, column=0, padx=5, pady=(5,10), sticky="")
+        self.AntiAPRSL = customtkinter.CTkLabel(master=self.tabview.tab("Location"), text=("Altitude (APRS):\n---"),font=customtkinter.CTkFont(size=14), justify='center')
+        self.AntiAPRSL.grid(row=5, column=0, padx=5, pady=(5,10), sticky="")
 
         self.DB = dbControl.database()
 
@@ -291,7 +303,7 @@ class App(customtkinter.CTk):
         self.DB.downloadData(fname="CanSat_Data_{}".format(current_time))
     
     def launchMap(self):
-        webbrowser.open('https://aprs.fi/#!z=1500&lat=13.1686&lng=77.5350')
+        webbrowser.open('https://aprs.fi/#!z=11&call=a%2FVU3YDJ&timerange=3600&tail=3600')
 
     def connectD(self):
         port_value = self.COMentry.get()
@@ -372,10 +384,13 @@ class App(customtkinter.CTk):
     
     def updateBatteryP(self):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
-            self.logData = "Battery : {}%\n".format(self.dataCame[19])
+            self.logData = "Battery Voltage: {}\n".format(self.dataCame[19])
             self.textbox.insert("0.0", self.logData)
-            self.batteryP.configure(text="Battery :\n{}%".format(self.dataCame[19]))
-            self.progressbar_battery.set(self.dataCame[19])
+            self.batteryP.configure(text="Battery V:\n{}".format(self.dataCame[19]))
+            value_battery = int(self.dataCame[19])/100
+            self.progressbar_battery.set(value_battery)
+            self.progress_label_battery.configure(text=f"Battery: {int(self.dataCame[19])}V")
+
         self.batteryP.after(200, self.updateBatteryP)
     
     def updateAlti(self):
@@ -387,17 +402,48 @@ class App(customtkinter.CTk):
 
     def updateLati(self):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
-            self.logData = "Latitude : {}\n".format(self.dataCame[17])
+            self.logData = "Latitude : {}\n".format(self.aprs_data_list[1])
             self.textbox.insert("0.0", self.logData)
-            self.LatiL.configure(text="Latitude :\n{}".format(self.dataCame[17]))
+            self.LatiL.configure(text="Latitude :\n{}".format(self.aprs_data_list[1]))
         self.LatiL.after(200, self.updateLati)
 
     def updateLongi(self):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
-            self.logData = "longitude: {}\n".format(self.dataCame[18])
+            self.logData = "longitude: {}\n".format(self.aprs_data_list[0])
             self.textbox.insert("0.0", self.logData)
-            self.LogiL.configure(text="longitude:\n{}".format(self.dataCame[18]))
+            self.LogiL.configure(text="longitude:\n{}".format(self.aprs_data_list[0]))
         self.LogiL.after(200, self.updateLongi)
+
+    def updateAltiAPRS(self):
+        if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
+            self.logData = "Altitude (APRS): {}\n".format(self.aprs_data_list[0])
+            self.textbox.insert("0.0", self.logData)
+            self.AntiAPRSL.configure(text="Altitude (APRS):\n{}".format(self.aprs_data_list[0]))
+        self.AntiAPRSL.after(200, self.updateAltiAPRS)
+
+    def fetch_aprs_data(self):
+        url = f'https://api.aprs.fi/api/get?name={self.callsign}&what=loc&apikey={self.apikey}&format=json'
+        res = requests.get(url=url)
+        data = res.json()['entries'][0]
+        #print(data)
+        return data
+
+    def update_aprs_data(self):
+        # Fetch APRS data
+        aprs_data = self.fetch_aprs_data()
+        
+        # Extract longitude, latitude, and altitude from the fetched data
+        longi = aprs_data['lng']
+        lati = aprs_data['lat']
+        alti = aprs_data['altitude']
+
+        # Replace the existing values in the list
+        self.aprs_data_list[0] = longi
+        self.aprs_data_list[1] = lati
+        self.aprs_data_list[2] = alti
+        #print(self.aprs_data_list)
+        # Schedule the next update after 1Min
+        self.after(60000, self.update_aprs_data)
 
     #def updateGraphTemp(self):
         '''
@@ -490,11 +536,12 @@ class App(customtkinter.CTk):
     
     def updateProgress(self):
         self.dataAG = self.DB.getGraphData()
-        self.dataAG = self.dataAG[1]
+        #print("Graph Data : ",self.dataAG)
+        self.dataAG = self.dataAG[2]
         xA = self.dataAG[0]
         yA = self.dataAG[1]
         self.dataHG = self.DB.getGraphData()
-        self.dataHG = self.dataHG[2]
+        self.dataHG = self.dataHG[1]
         xH = self.dataHG[0]
         yH = self.dataHG[1]
         self.dataTG = self.DB.getGraphData()
@@ -523,7 +570,7 @@ class App(customtkinter.CTk):
         value_temp = int(yT[0])
         value_humi = int(yH[0])
         value_alti = int(yA[0])
-        #print(self.temp)
+        print(self.temp)
         if([value_alti,value_humi,value_temp] != self.temp):
             self.temp = [value_alti,value_humi,value_temp]
             self.logData = f"Temperature: {value_temp}°C \nHumidity: {value_humi}% \nAltitude: {value_alti}m \n"
@@ -537,14 +584,24 @@ class App(customtkinter.CTk):
 
     def dumpDB(self):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
-            self.DB.dumpData(self.dataCame)
+            #Change the CSV Data here ========== STARTS
+            print("Raw Data : ",self.dataCame)
+            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14],self.dataCame[6],self.dataCame[7],self.dataCame[8]]
+            print("New Data : ",newFormat)
+            #Change the CSV Data here ========== ENDS
+            self.DB.dumpData(newFormat)
         self.after(200, self.dumpDB)
 
     def backupData(self):
         if(self.status.isConnect() and self.dataCame!=None):
             now = datetime.now()
             current_time = now.strftime("%w%d%y")
-            self.DB.createLiveData(fname="CanSat_Data_Backup_{}".format(current_time),data=self.dataCame)
+            #Change the CSV Data here ========== STARTS
+            print("Raw Data : ",self.dataCame)
+            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14],self.dataCame[6],self.dataCame[7],self.dataCame[8]]
+            print("New Data : ",newFormat)
+            #Change the CSV Data here ========== ENDS
+            self.DB.createLiveData(fname="CanSat_Data_Backup_{}".format(current_time),data=newFormat)
         self.after(200, self.backupData)
 
         
@@ -577,6 +634,8 @@ if __name__ == "__main__":
     #app.updateGraphAlti()
     app.updateBatteryP()
     app.updateProgress()
+    app.update_aprs_data()
+    app.updateAltiAPRS()
 
     app.backupData()
 
