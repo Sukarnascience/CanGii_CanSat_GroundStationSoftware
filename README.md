@@ -1,6 +1,6 @@
-# CanGii V8.14.18
+# CanGii V8.14.19
 
-> **Whats New in V8.14.18 ?** : Format has been changed...
+> **Whats New in V8.14.19 ?** : Added 3 Buttons to send command to Satellite
 
 CanGii is a Python-based satellite data visualization tool for real-time monitoring and analysis of telemetry data. It offers a user-friendly interface and supports various satellite communication protocols.
 
