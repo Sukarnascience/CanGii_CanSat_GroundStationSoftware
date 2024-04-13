@@ -186,10 +186,12 @@ class App(customtkinter.CTk):
         #self.optionmenu_3.grid(row=3, column=0, padx=20, pady=(5, 10))
         #self.optionmenu_4 = customtkinter.CTkEntry(self.tabview.tab("Calibration 01"), placeholder_text="Altitude ±XX m")
         #self.optionmenu_4.grid(row=4, column=0, padx=20, pady=(5, 10))
-        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Start Telemetry")#, command=self.updateGraphTemp)
+        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Start Telemetry", command=lambda: self.handle_button_press("Start Telemetry"))#, command=self.updateGraphTemp)
         self.combobox_1.grid(row=4, column=0, padx=20, pady=(5, 10))
-        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Calibrate")#, command=self.updateGraphTemp)
+        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Calibrate", command=lambda: self.handle_button_press("Calibrate"))#, command=self.updateGraphTemp)
         self.combobox_1.grid(row=5, column=0, padx=20, pady=(5, 10))
+        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Stop Cansat Cam", command=lambda: self.handle_button_press("Stop Cansat Cam"))#, command=self.updateGraphTemp)
+        self.combobox_1.grid(row=6, column=0, padx=20, pady=(5, 10))
 
         self.string_input_button0 = customtkinter.CTkButton(self.tabview.tab("Calibration 02"), text="Set Current Time",
                                                            command=self.download_in_CSV)
@@ -269,6 +271,14 @@ class App(customtkinter.CTk):
         self.altiPlate = customtkinter.CTkFrame(self, width=250)
         self.altiPlate.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
         '''
+
+    def handle_button_press(self, command):
+        if command == "Start Telemetry":
+            self.status.sendData("s")
+        elif command == "Calibrate":
+            self.status.sendData("c")
+        elif command == "Stop Cansat Cam":
+            self.status.sendData("v")
 
     def openMap(self):
         app = satMap.App()
@@ -424,25 +434,39 @@ class App(customtkinter.CTk):
 
     def fetch_aprs_data(self):
         url = f'https://api.aprs.fi/api/get?name={self.callsign}&what=loc&apikey={self.apikey}&format=json'
-        res = requests.get(url=url)
-        data = res.json()['entries'][0]
-        #print(data)
-        return data
+        retries = 2  # Number of retries
+        for _ in range(retries):
+            try:
+                res = requests.get(url=url, timeout=10)  # Timeout set to 10 seconds
+                data = res.json()['entries'][0]
+                return data
+            except (requests.Timeout, requests.ConnectionError) as e:
+                print(f"Failed to fetch APRS data: {e}")
+                print("Retrying...")
+                time.sleep(2)  # Wait for 2 seconds before retrying
+        print("Could not fetch APRS data after retries")
+        return None
 
     def update_aprs_data(self):
         # Fetch APRS data
         aprs_data = self.fetch_aprs_data()
         
-        # Extract longitude, latitude, and altitude from the fetched data
-        longi = aprs_data['lng']
-        lati = aprs_data['lat']
-        alti = aprs_data['altitude']
+        if aprs_data:
+            # Extract longitude, latitude, and altitude from the fetched data
+            longi = aprs_data['lng']
+            lati = aprs_data['lat']
+            alti = aprs_data['altitude']
 
-        # Replace the existing values in the list
-        self.aprs_data_list[0] = longi
-        self.aprs_data_list[1] = lati
-        self.aprs_data_list[2] = alti
-        #print(self.aprs_data_list)
+            # Replace the existing values in the list
+            self.aprs_data_list[0] = longi
+            self.aprs_data_list[1] = lati
+            self.aprs_data_list[2] = alti
+        else:
+            print("[Fetching]")
+            self.aprs_data_list[0] = "-NA-"
+            self.aprs_data_list[1] = "-NA-"
+            self.aprs_data_list[2] = "-NA-"
+
         # Schedule the next update after 1Min
         self.after(60000, self.update_aprs_data)
 

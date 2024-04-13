@@ -50,3 +50,13 @@ class satC_Device():
                 return None
         except:
             print("Board ERROR")
+    
+    def sendData(self, data):
+        try:
+            if self.isConnect():
+                self.device.write(data.encode())
+                print("Data sent successfully")
+            else:
+                print("Device not connected")
+        except Exception as e:
+            print("Error sending data:", e)
