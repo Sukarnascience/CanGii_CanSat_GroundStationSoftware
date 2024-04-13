@@ -11,6 +11,7 @@ import socket
 
 import requests
 from datetime import datetime
+#from datetime import datetime
 
 import os
 from PIL import Image
@@ -606,12 +607,20 @@ class App(customtkinter.CTk):
         # Schedule the method to be called after a certain interval
         self.after(1000, self.updateProgress)
 
+    def get_current_timestamp(self):
+        # Get current time
+        current_time = datetime.now()
+        # Format time as "hh:mm:ss"
+        formatted_time = current_time.strftime("%H:%M:%S")
+        return formatted_time
 
     def dumpDB(self):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
             #Change the CSV Data here ========== STARTS
             print("Raw Data : ",self.dataCame)
-            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[6],self.dataCame[7],self.dataCame[8],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14]]
+            # Adding PC TimeStamp in the place of self.dataCame[2] into current_timestamp = get_current_timestamp()
+            current_timestamp = self.get_current_timestamp()
+            newFormat = [self.dataCame[0],current_timestamp,self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[6],self.dataCame[7],self.dataCame[8],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14]]
             print("New Data : ",newFormat)
             #Change the CSV Data here ========== ENDS
             self.DB.dumpData(newFormat)
@@ -623,7 +632,9 @@ class App(customtkinter.CTk):
             current_time = now.strftime("%w%d%y")
             #Change the CSV Data here ========== STARTS
             print("Raw Data : ",self.dataCame)
-            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[6],self.dataCame[7],self.dataCame[8],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14]]
+            # Adding PC TimeStamp in the place of self.dataCame[2] into current_timestamp = get_current_timestamp()
+            current_timestamp = self.get_current_timestamp()
+            newFormat = [self.dataCame[0],current_timestamp,self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[6],self.dataCame[7],self.dataCame[8],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14]]
             print("New Data : ",newFormat)
             #Change the CSV Data here ========== ENDS
             self.DB.createLiveData(fname="CanSat_Data_Backup_{}".format(current_time),data=newFormat)

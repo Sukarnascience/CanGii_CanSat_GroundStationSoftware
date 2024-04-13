@@ -1,6 +1,6 @@
-# CanGii V8.14.19
+# CanGii V8.14.20
 
-> **Whats New in V8.14.19 ?** : Added 3 Buttons to send command to Satellite
+> **Whats New in V8.14.20 ?** : Adding PC TimeStamp in the place of ```self.dataCame[2]``` into ```current_timestamp = get_current_timestamp()```
 
 CanGii is a Python-based satellite data visualization tool for real-time monitoring and analysis of telemetry data. It offers a user-friendly interface and supports various satellite communication protocols.
 
