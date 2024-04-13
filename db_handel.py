@@ -44,7 +44,7 @@ class database():
         #print(self.graphAltiP)
         countH = 0
         for i in self.graphData:
-            self.graphHumiP[1][countH] = i[14]
+            self.graphHumiP[1][countH] = i[17]
             self.graphHumiP[0][countH] = i[1]
             countH+=1
         #print(self.graphHumiP)

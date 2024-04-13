@@ -42,6 +42,7 @@ class App(customtkinter.CTk):
         self.globalDataToPlot = ""
         self.press_value = 0
         #APRS
+        #https://api.aprs.fi/api/get?name=VU3YDJ&what=loc&apikey=180657.6sGZMpqplCbd1IuB&format=json
         self.callsign = 'VU3YDJ'
         self.loc = 'OI33'
         self.apikey = '180657.6sGZMpqplCbd1IuB'
@@ -416,9 +417,9 @@ class App(customtkinter.CTk):
 
     def updateAltiAPRS(self):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
-            self.logData = "Altitude (APRS): {}\n".format(self.aprs_data_list[0])
+            self.logData = "Altitude (APRS): {}\n".format(self.aprs_data_list[2])
             self.textbox.insert("0.0", self.logData)
-            self.AntiAPRSL.configure(text="Altitude (APRS):\n{}".format(self.aprs_data_list[0]))
+            self.AntiAPRSL.configure(text="Altitude (APRS):\n{}".format(self.aprs_data_list[2]))
         self.AntiAPRSL.after(200, self.updateAltiAPRS)
 
     def fetch_aprs_data(self):
@@ -586,7 +587,7 @@ class App(customtkinter.CTk):
         if(self.status.isConnect() and self.dataCame!=None and len(self.dataCame)==self.LENGHTOFDATA):
             #Change the CSV Data here ========== STARTS
             print("Raw Data : ",self.dataCame)
-            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14],self.dataCame[6],self.dataCame[7],self.dataCame[8]]
+            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[6],self.dataCame[7],self.dataCame[8],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14]]
             print("New Data : ",newFormat)
             #Change the CSV Data here ========== ENDS
             self.DB.dumpData(newFormat)
@@ -598,7 +599,7 @@ class App(customtkinter.CTk):
             current_time = now.strftime("%w%d%y")
             #Change the CSV Data here ========== STARTS
             print("Raw Data : ",self.dataCame)
-            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14],self.dataCame[6],self.dataCame[7],self.dataCame[8]]
+            newFormat = [self.dataCame[0],self.dataCame[2],self.dataCame[1],self.dataCame[12],self.dataCame[13],self.dataCame[15],self.dataCame[19],self.aprs_data_list[1],self.aprs_data_list[0],self.aprs_data_list[2],self.dataCame[6],self.dataCame[7],self.dataCame[8],self.dataCame[3],self.dataCame[4],self.dataCame[5],self.dataCame[20],self.dataCame[14]]
             print("New Data : ",newFormat)
             #Change the CSV Data here ========== ENDS
             self.DB.createLiveData(fname="CanSat_Data_Backup_{}".format(current_time),data=newFormat)
