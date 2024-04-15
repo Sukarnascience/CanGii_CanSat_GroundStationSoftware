@@ -576,9 +576,9 @@ class App(customtkinter.CTk):
         yT = self.dataTG[1]
         
         # Your logic to get the values for the progress bars
-        value_temp = int(yT[0])/100
-        value_humi = int(yH[0])/100
-        value_alti = round(int(yA[0])/300, 2)
+        value_temp = float(yT[0])/100
+        value_humi = float(yH[0])/100
+        value_alti = round(float(yA[0])/2000, 2)
         #print(value_temp)
         #print(value_humi)
         #print(value_alti)
@@ -588,14 +588,14 @@ class App(customtkinter.CTk):
         self.progressbar_humi.set(value_humi)
         self.progressbar_alti.set(value_alti)
 
-        # Update progress bar labels
-        self.progress_label_temp.configure(text=f"Temperature: {int(yT[0])}°C")
-        self.progress_label_humi.configure(text=f"Humidity: {int(yH[0])}%")
-        self.progress_label_alti.configure(text=f"Altitude: {int(yA[0])}m")
+        # Update rogress bar labels
+        self.progress_label_temp.configure(text=f"Temperature: {int(float(yT[0]))}°C")
+        self.progress_label_humi.configure(text=f"Humidity: {int(float(yH[0]))}%")
+        self.progress_label_alti.configure(text=f"Altitude: {int(float(yA[0]))}m")
 
-        value_temp = int(yT[0])
-        value_humi = int(yH[0])
-        value_alti = int(yA[0])
+        value_temp = float(yT[0])
+        value_humi = float(yH[0])
+        value_alti = float(yA[0])
         print(self.temp)
         if([value_alti,value_humi,value_temp] != self.temp):
             self.temp = [value_alti,value_humi,value_temp]
