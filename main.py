@@ -193,6 +193,8 @@ class App(customtkinter.CTk):
         self.combobox_1.grid(row=5, column=0, padx=20, pady=(5, 10))
         self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Stop Cansat Cam", command=lambda: self.handle_button_press("Stop Cansat Cam"))#, command=self.updateGraphTemp)
         self.combobox_1.grid(row=6, column=0, padx=20, pady=(5, 10))
+        self.combobox_1 = customtkinter.CTkButton(self.tabview.tab("Calibration 01"), text="Eject", command=lambda: self.handle_button_press("Eject"))#, command=self.updateGraphTemp)
+        self.combobox_1.grid(row=7, column=0, padx=20, pady=(5, 10))
 
         self.string_input_button0 = customtkinter.CTkButton(self.tabview.tab("Calibration 02"), text="Set Current Time",
                                                            command=self.download_in_CSV)
@@ -280,6 +282,8 @@ class App(customtkinter.CTk):
             self.status.sendData("c")
         elif command == "Stop Cansat Cam":
             self.status.sendData("v")
+        elif command == "Eject":
+            self.status.sendData("e")
 
     def openMap(self):
         app = satMap.App()
