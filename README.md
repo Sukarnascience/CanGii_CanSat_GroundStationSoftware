@@ -1,3 +1,10 @@
+If you liked it, please show your support by donating. 👇
+<p><a href="https://www.buymeacoffee.com/sukarnajana"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="sukarnajana" /></a></p>
+<br>
+<br>
+<br>
+<br>
+
 ![Logo](./logo.png)
 # CanGii V8.14.20 
 
